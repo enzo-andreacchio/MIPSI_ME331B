@@ -23,6 +23,7 @@ TBA=0; TCB=0; TF=0; TR=0; xDesired=0; yDesired=0; qBDesiredDt=0; xDesiredDt=0; y
 yRaw=0; penDownDesired=0;
 trajectoryTime=[]; trajectoryX=[]; trajectoryY=[]; trajectoryPenDown=[]; trajectoryXDt=[]; trajectoryYDt=[]; trajectoryXDDt=[]; trajectoryYDDt=[];
 tracePointCount=50;
+dataFilesDir = fullfile( fileparts(mfilename('fullpath')), 'data_files' );
 
 
 %-------------------------------+--------------------------+-------------------+-----------------
@@ -446,10 +447,10 @@ OutputToScreenOrFile( [], 0, 0 );   % Close output files.
          if( ~isempty(FileIdentifier) ),
             for( i = 1 : tracePointCount + 9 ),  fclose( FileIdentifier(i) );  end
             clear FileIdentifier;
-            fprintf( 1, '\n Output is in the files MIPSI.i  (i=1, ..., %d)\n', tracePointCount + 9 );
+            fprintf( 1, '\n Output is in the files data_files/MIPSI.i  (i=1, ..., %d)\n', tracePointCount + 9 );
             fprintf( 1, '\n Note: To automate plotting, issue the command OutputPlot in MotionGenesis.\n' );
             fprintf( 1, '\n To load and plot columns 1 and 2 with a solid line and columns 1 and 3 with a dashed line, enter:\n' );
-            fprintf( 1, '    someName = load( ''MIPSI.1'' );\n' );
+            fprintf( 1, '    someName = load( fullfile(''data_files'', ''MIPSI.1'') );\n' );
             fprintf( 1, '    plot( someName(:,1), someName(:,2), ''-'', someName(:,1), someName(:,3), ''--'' )\n\n' );
          end
          clear hasHeaderInformationBeenWritten;
@@ -463,45 +464,45 @@ OutputToScreenOrFile( [], 0, 0 );   % Close output files.
          end
          if( shouldPrintToFile && isempty(FileIdentifier) ),
             FileIdentifier = zeros( 1, tracePointCount + 9 );
-            FileIdentifier(1) = fopen('MIPSI.1', 'wt');   if( FileIdentifier(1) == -1 ), error('Error: unable to open file MIPSI.1'); end
+            FileIdentifier(1) = OpenDataFile(1);
             fprintf(FileIdentifier(1), '%% FILE: MIPSI.1\n%%\n' );
             fprintf(FileIdentifier(1), '%%       t              x              y             TR             TBA            TCB            TF             qA             qB             qC\n' );
             fprintf(FileIdentifier(1), '%%     (sec)        (meters)       (meters)         (N*m)          (N*m)          (N*m)          (N*m)          (deg)          (deg)          (deg)\n\n' );
-            FileIdentifier(2) = fopen('MIPSI.2', 'wt');   if( FileIdentifier(2) == -1 ), error('Error: unable to open file MIPSI.2'); end
+            FileIdentifier(2) = OpenDataFile(2);
             fprintf(FileIdentifier(2), '%% FILE: MIPSI.2\n%%\n' );
             fprintf(FileIdentifier(2), '%%       t         P_No_Acm[1]    P_No_Acm[2]    P_No_Acm[3]     N_A[1,1]       N_A[1,2]       N_A[1,3]       N_A[2,1]       N_A[2,2]       N_A[2,3]       N_A[3,1]       N_A[3,2]       N_A[3,3]\n' );
             fprintf(FileIdentifier(2), '%%   (second)        (meter)        (meter)        (meter)       (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)\n\n' );
-            FileIdentifier(3) = fopen('MIPSI.3', 'wt');   if( FileIdentifier(3) == -1 ), error('Error: unable to open file MIPSI.3'); end
+            FileIdentifier(3) = OpenDataFile(3);
             fprintf(FileIdentifier(3), '%% FILE: MIPSI.3\n%%\n' );
             fprintf(FileIdentifier(3), '%%       t         P_No_Bo[1]     P_No_Bo[2]     P_No_Bo[3]      N_B[1,1]       N_B[1,2]       N_B[1,3]       N_B[2,1]       N_B[2,2]       N_B[2,3]       N_B[3,1]       N_B[3,2]       N_B[3,3]\n' );
             fprintf(FileIdentifier(3), '%%   (second)        (meter)        (meter)        (meter)       (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)\n\n' );
-            FileIdentifier(4) = fopen('MIPSI.4', 'wt');   if( FileIdentifier(4) == -1 ), error('Error: unable to open file MIPSI.4'); end
+            FileIdentifier(4) = OpenDataFile(4);
             fprintf(FileIdentifier(4), '%% FILE: MIPSI.4\n%%\n' );
             fprintf(FileIdentifier(4), '%%       t         P_No_Co[1]     P_No_Co[2]     P_No_Co[3]      N_C[1,1]       N_C[1,2]       N_C[1,3]       N_C[2,1]       N_C[2,2]       N_C[2,3]       N_C[3,1]       N_C[3,2]       N_C[3,3]\n' );
             fprintf(FileIdentifier(4), '%%   (second)        (meter)        (meter)        (meter)       (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)\n\n' );
-            FileIdentifier(5) = fopen('MIPSI.5', 'wt');   if( FileIdentifier(5) == -1 ), error('Error: unable to open file MIPSI.5'); end
+            FileIdentifier(5) = OpenDataFile(5);
             fprintf(FileIdentifier(5), '%% FILE: MIPSI.5\n%%\n' );
             fprintf(FileIdentifier(5), '%%       t         P_No_Fcm[1]    P_No_Fcm[2]    P_No_Fcm[3]     N_F[1,1]       N_F[1,2]       N_F[1,3]       N_F[2,1]       N_F[2,2]       N_F[2,3]       N_F[3,1]       N_F[3,2]       N_F[3,3]\n' );
             fprintf(FileIdentifier(5), '%%   (second)        (meter)        (meter)        (meter)       (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)\n\n' );
-            FileIdentifier(6) = fopen('MIPSI.6', 'wt');   if( FileIdentifier(6) == -1 ), error('Error: unable to open file MIPSI.6'); end
+            FileIdentifier(6) = OpenDataFile(6);
             fprintf(FileIdentifier(6), '%% FILE: MIPSI.6\n%%\n' );
             fprintf(FileIdentifier(6), '%%       t         P_No_Rcm[1]    P_No_Rcm[2]    P_No_Rcm[3]     N_R[1,1]       N_R[1,2]       N_R[1,3]       N_R[2,1]       N_R[2,2]       N_R[2,3]       N_R[3,1]       N_R[3,2]       N_R[3,3]\n' );
             fprintf(FileIdentifier(6), '%%   (second)        (meter)        (meter)        (meter)       (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)      (NoUnits)\n\n' );
-            FileIdentifier(7) = fopen('MIPSI.7', 'wt');   if( FileIdentifier(7) == -1 ), error('Error: unable to open file MIPSI.7'); end
+            FileIdentifier(7) = OpenDataFile(7);
             fprintf(FileIdentifier(7), '%% FILE: MIPSI.7\n%%\n' );
             fprintf(FileIdentifier(7), '%%       t         P_No_FN[1]     P_No_FN[2]     P_No_FN[3]\n' );
             fprintf(FileIdentifier(7), '%%   (second)        (meter)        (meter)        (meter)\n\n' );
-            FileIdentifier(8) = fopen('MIPSI.8', 'wt');   if( FileIdentifier(8) == -1 ), error('Error: unable to open file MIPSI.8'); end
+            FileIdentifier(8) = OpenDataFile(8);
             fprintf(FileIdentifier(8), '%% FILE: MIPSI.8\n%%\n' );
             fprintf(FileIdentifier(8), '%%       t       P_No_Pencil[1] P_No_Pencil[2] P_No_Pencil[3]\n' );
             fprintf(FileIdentifier(8), '%%   (second)        (meter)        (meter)        (meter)\n\n' );
-            FileIdentifier(9) = fopen('MIPSI.9', 'wt');   if( FileIdentifier(9) == -1 ), error('Error: unable to open file MIPSI.9'); end
+            FileIdentifier(9) = OpenDataFile(9);
             fprintf(FileIdentifier(9), '%% FILE: MIPSI.9\n%%\n' );
             fprintf(FileIdentifier(9), '%%       t         P_No_RN[1]     P_No_RN[2]     P_No_RN[3]\n' );
             fprintf(FileIdentifier(9), '%%   (second)        (meter)        (meter)        (meter)\n\n' );
             for( i = 1 : tracePointCount )
                fileNumber = i + 9;
-               FileIdentifier(fileNumber) = fopen(sprintf('MIPSI.%d', fileNumber), 'wt');   if( FileIdentifier(fileNumber) == -1 ), error('Error: unable to open file MIPSI.%d', fileNumber); end
+               FileIdentifier(fileNumber) = OpenDataFile(fileNumber);
                fprintf(FileIdentifier(fileNumber), '%% FILE: MIPSI.%d\n%%\n', fileNumber );
                fprintf(FileIdentifier(fileNumber), '%%       t          P_No_P%d[1]    P_No_P%d[2]    P_No_P%d[3]\n', i, i, i );
                fprintf(FileIdentifier(fileNumber), '%%   (second)        (meter)        (meter)        (meter)\n\n' );
@@ -524,6 +525,17 @@ OutputToScreenOrFile( [], 0, 0 );   % Close output files.
          outputIndex = 88 + 4*(i-1);
          if( shouldPrintToFile ), WriteNumericalData( FileIdentifier(i+9), Output(outputIndex:outputIndex+3) ); end
       end
+   end
+
+
+%===========================================================================
+   function fileIdentifier = OpenDataFile( fileNumber )
+      %===========================================================================
+      if( ~exist(dataFilesDir, 'dir') ),  mkdir(dataFilesDir);  end
+      fileName = sprintf( 'MIPSI.%d', fileNumber );
+      filePath = fullfile( dataFilesDir, fileName );
+      fileIdentifier = fopen( filePath, 'wt' );
+      if( fileIdentifier == -1 ),  error('Error: unable to open file %s', filePath);  end
    end
 
 

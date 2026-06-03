@@ -2,3 +2,10 @@
 /__pycache__
 old_MIPSI.json
 old_MIPSI.m
+MIPSI_working.txt
+csv_files/
+text_obj/
+MIPSI.in
+MIPSI.[0-9]*
+data_files/*
+!data_files/.gitkeep

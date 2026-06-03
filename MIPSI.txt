@@ -84,9 +84,9 @@ Constant wnX = 5 rad/sec
 Constant wnY = 20 rad/sec
 Constant wnQB = 10 rad/sec
 
-Constant xDesired = 0 meters
+SetDt( xDesired = 1*cos(2*t) )
+SetDt( yDesired = 0.8 + 0.4*sin(4*t) )
 Constant qBDesired = 0 deg
-Constant yDesired = 0.5 meters
 
 ControlEqnX = DtDt(xDesired - x) + 2*wnX*Dt(xDesired - x) + wnX^2*(xDesired - x)
 ControlEqnY = DtDt(yDesired - y) + 2*wnY*Dt(yDesired - y) + wnY^2*(yDesired - y)
@@ -106,8 +106,6 @@ Output t sec, x meters, y meters, TR N*m, TBA N*m, TCB N*m, TF N*m, qA deg, qB d
 Animate( N, No )
 
 ODE( [DynamicsKane; DtDt(Contact); Dt(Rolling); ControlEqnX; ControlEqnY; ControlEqnQB; TorqueSymmetry] = 0, &
-     qA'', qB'', qC'', x'', y'', wR', wF', TR, TBA, TCB, TF, FxR, FyR, FxF, FyF ) MIPSI.m
+     qA'', qB'', qC'', x'', y'', wR', wF', TR, TBA, TCB, TF, FxR, FyR, FxF, FyF ) data_files/MIPSI
 
 Quit
-
-

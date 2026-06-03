@@ -493,7 +493,7 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
 
 if __name__ == "__main__":
     # --- Configurable Variables ---
-    INPUT_STRING = "I LOVE ME331"
+    INPUT_STRING = "I LOVE ME331B"
     Y_MIN_LIMIT = 0.4
     Y_MAX_LIMIT = 1.0
     FEED_RATE = 1  # Units per second velocity

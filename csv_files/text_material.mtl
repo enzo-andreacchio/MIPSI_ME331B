@@ -1,5 +1,0 @@
-# Material definitions for text background overlay
-newmtl NeonProjectionColor
-Ka 0.0 0.5 1.0
-Kd 0.0 0.6 1.0
-Illum 1
