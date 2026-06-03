@@ -1,0 +1,47 @@
+File: MIPSI.in
+----------------------------------------------------------+------------------
+Description          Quantity             Units           | Value
+----------------------------------------------------------|------------------
+Constant             g                    m/s^2           |  9.8
+Constant             L                    m               |  1.0
+Constant             mLink                kg              |  1
+Constant             mWheel               kg              |  0.5
+Constant             qBMid                deg             |  0
+Constant             qBRange              deg             |  0
+Constant             rLink                meters          |  0.05
+Constant             rWheel               meters          |  0.25
+Constant             wnQB                 rad/sec         |  10
+Constant             wnX                  rad/sec         |  5
+Constant             wnY                  rad/sec         |  20
+
+Initial Value        qA                   deg             |  45
+Initial Value        qB                   deg             |  0
+Initial Value        qC                   deg             |  45
+Initial Value        qF                   deg             |  0
+Initial Value        qR                   deg             |  0
+Initial Value        wF                   rad/sec         |  0
+Initial Value        wR                   rad/sec         |  0
+Initial Value        x                    m               |  0.5
+Initial Value        y                    m               |  0.9571067811865475
+Initial Value        qA'                  rad/sec         |  0
+Initial Value        qB'                  rad/sec         |  0
+Initial Value        qC'                  rad/sec         |  0
+Initial Value        x'                   m/s             |  0
+Initial Value        y'                   m/s             |  0
+
+Initial Time         tInitial             second          |  0.0
+Final Time           tFinal               sec             |  10
+Integration Step     tStep                sec             |  0.02
+Print-Integer        printIntScreen       0 or +integer   |  1
+Print-Integer        printIntFile         0 or +integer   |  1
+Absolute Error       absError                             |  1.0E-09
+Relative Error       relError                             |  1.0E-08
+----------------------------------------------------------+------------------
+Note: Use spaces not tabs while editing this file.
+
+      absError should be set equal to 10^(-8)*Xsmall, where Xsmall is the estimated
+               smallest maximum absolute value of the variables being integrated.
+
+      relError should be set equal to 10^(-d), where d is no less than the desired
+               number of significant digits of numerical integration results.
+-----------------------------------------------------------------------------

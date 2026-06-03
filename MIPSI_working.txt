@@ -1,0 +1,134 @@
+%-------------------------------------------------------------------------------
+%   Physical objects.
+NewtonianFrame  N        % Earth.
+RigidBody       R        % Rear wheel.
+RigidBody       F        % Front wheel.
+RigidBody       A        % Left link.
+RigidBody       B        % Middle link.
+RigidBody       C        % Right link.
+Point           RN(R)    % Point of the rear wheel in contact with N.
+Point           FN(F)    % Point of the front wheel in contact with N.
+Point           PGoal    % Desired Bcm position from No.
+%-------------------------------------------------------------------------------
+%   Mathematical declarations.
+Constant   g = 9.8 m/s^2  % Earth's gravitational acceleration.
+Constant   L = 0.5 m      % Length of links A,B,C.
+Variable   x'', y''       % Nx> and Ny> measures of Bcm from No.
+Variable   wR', wF'       % Nz> mesures of R and F's angular velocities in N.
+Variable   qA''           % Angle from Nx> to Ax> with sense Nz>.
+Variable   qB''           % Angle from Nx> to Bx> with sense Nz>.
+Variable   qC''           % Angle from Nx> to Cx> with sense -Nz>.
+Specified  TR             % Torque on A from R.
+Specified  TBA            % Torque on B from A.
+Specified  TCB            % Torque on C from B.
+Specified  TF             % Torque on F from C.
+Specified xDesired'', yDesired''
+%-------------------------------------------------------------------------------
+%   Mass and inertia properties.
+Constant rWheel = 0.25 meters
+Constant LWheel = 0.05 meters
+R.SetMassInertia( mWheel = 0.5 kg, Rcm, R, IxxWheel = 1/12 * mWheel * (3*rWheel^2 + LWheel^2), IxxWheel, IzzWheel = 1/2 * mWheel * rWheel^2 )
+F.SetMassInertia( mWheel, Fcm, F, IxxWheel, IxxWheel, IzzWheel )
+
+Constant rLink = 0.05 meters
+A.SetMassInertia( mLink = 1 kg, Acm, A, IxxLink = 1/2 * mLink * rLink^2, IyyLink = 1/12 * mLink * (3*rLink^2 + L^2), IyyLink )
+B.SetMassInertia( mLink, Bcm, B, IxxLink, IyyLink, IyyLink )
+C.SetMassInertia( mLink, Ccm, C, IxxLink, IyyLink, IyyLink )
+%-------------------------------------------------------------------------------
+%   Rotational kinematics.
+Variable qR' = wR
+Variable qF' = wF
+R.SetRotationMatrixZ( N, qR )
+F.SetRotationMatrixZ( N, qF )
+A.RotateZ( N, qA )
+B.RotateZ( N, qB )
+C.RotateNegativeZ( N, qC )
+%-------------------------------------------------------------------------------
+%   Translational kinematics.
+Bcm.Translate(  No,   x*Nx> + y*Ny> )
+Bo.Translate(  Bcm,      -0.5*L*Bx> )
+Acm.Translate(  Bo,      -0.5*L*Ax> )
+Rcm.Translate( Acm,      -0.5*L*Ax> )
+RN.Translate(  Rcm,     -rWheel*Ny> )
+Co.Translate(  Bcm,       0.5*L*Bx> )
+Ccm.Translate(  Co,       0.5*L*Cx> )
+Fcm.Translate( Ccm,       0.5*L*Cx> )
+FN.Translate(  Fcm,     -rWheel*Ny> ) 
+PGoal.Translate( No,    xDesired*Nx> + yDesired*Ny> )
+%-------------------------------------------------------------------------------
+%   Motion constraints.
+Contact[1] = Dot( Ny>, RN.GetPosition(No) )
+Contact[2] = Dot( Ny>, FN.GetPosition(No) )
+Rolling[1] = Dot( RN.GetVelocity(N), Nx> )
+Rolling[2] = Dot( FN.GetVelocity(N), Nx> )
+% SolveDt( [Rolling, Dt(Contact)] = 0, wR, wF, qC', y' )
+%-------------------------------------------------------------------------------
+%   Add relevant forces and torques.
+System.AddForceGravity( -g*Ny> )
+A.AddTorque( R,  TR*Nz> )
+B.AddTorque( A, TBA*Nz> )
+C.AddTorque( B, TCB*Nz> )
+F.AddTorque( C,  TF*Nz> )
+
+Variable FxR, FyR
+Variable FxF, FyF
+RN.AddForce( FxR*Nx> + FyR*Ny> )
+FN.AddForce( FxF*Nx> + FyF*Ny> )
+%-------------------------------------------------------------------------------
+%   Kane's method
+SetGeneralizedSpeed( x', y', qA', qB', qC', wR, wF )
+DynamicsKane = System.GetDynamicsKane()
+%-------------------------------------------------------------------------------
+
+Constant wnX = 5 rad/sec
+Constant wnY = 20 rad/sec
+Constant wnQA = 10 rad/sec
+Constant wnQB = 10 rad/sec
+Constant wnQC = 10 rad/sec
+
+SetDt( xDesired = 1*cos(2*t) )
+
+Constant qAMid = 45 deg
+Constant qARange = 15 deg
+Specified qADesired''
+SetDt( qADesired = qAMid + qARange*sin(t) )
+
+Constant qBMid = 0 deg
+Constant qBRange = 0 deg
+Specified qBDesired''
+SetDt( qBDesired = qBMid + qBRange*cos(2*t) )
+
+
+yRaw = 0.4 + 0.2*sin(4*t)
+isAboveMax = IsPositive( yRaw - 0.42 )
+isBelowMax = IsNegativeOr0( yRaw - 0.42 )
+
+SetDt( yDesired = yRaw )
+
+Constant qCDesired = -45 deg
+
+ControlEqnX = DtDt(xDesired - x) + 2*wnX*Dt(xDesired - x) + wnX^2*(xDesired - x)
+ControlEqnY = DtDt(yDesired - y) + 2*wnY*Dt(yDesired - y) + wnY^2*(yDesired - y)
+ControlEqnQA = DtDt(qADesired - qA) + 2*wnQA*Dt(qADesired - qA) + wnQA^2*(qADesired - qA)
+ControlEqnQB = DtDt(qBDesired - qB) + 2*wnQB*Dt(qBDesired - qB) + wnQB^2*(qBDesired - qB)
+ControlEqnQC = DtDt(qCDesired - qC) + 2*wnQC*Dt(qCDesired - qC) + wnQC^2*(qCDesired - qC)
+
+TorqueSymmetry = TR + TF
+
+Input qA = 45 deg, qB = 0 deg, x = 0.5 m, qR = 0 deg, qF = 0 deg
+SolveSetInput( Contact = 0, y = 1.5 m, qC = -45 deg )
+
+Input x' = 0 m/s, qA' = 0 rad/sec, qB' = 0 rad/sec
+SolveSetInput( [Rolling, Dt(Contact)] = 0, wR = 0 rad/sec, wF = 0 rad/sec, y' = 0 m/s, qC' = 0 rad/sec )
+
+Input tFinal = 10 sec, tStep = 0.02 sec, absError = 1.0E-09
+Output t sec, x meters, y meters, TR N*m, TBA N*m, TCB N*m, TF N*m, qA deg, qB deg, qC deg
+
+Animate( N, No )
+
+ODE( [DynamicsKane; DtDt(Contact); Dt(Rolling); ControlEqnX; ControlEqnY; ControlEqnQB; TorqueSymmetry] = 0, &
+     qA'', qB'', qC'', x'', y'', wR', wF', TR, TBA, TCB, TF, FxR, FyR, FxF, FyF ) MIPSI
+
+Quit
+
+
