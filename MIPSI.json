@@ -120,7 +120,7 @@
           "segments_depth": 1
         },
         "background": {
-          "visible": false,
+          "visible": true,
           "type": "mesh",
           "position": {
             "x": 0,
