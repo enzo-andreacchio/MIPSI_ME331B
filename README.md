@@ -1,8 +1,8 @@
-# MIPSI — Robotic Bicycle Dynamics, Simulation & Control
+# MIPSI — Robotic Bicycle
 
 This repository contains the **MIPSI** project, developed for **ME331B: Advanced Dynamics and Computation** at Stanford University, taught by **Prof. Paul Mitiguy**.
 
-The project demonstrates the dynamics simulation and control of a **robotic bicycle**, capable of tracing out user-specified text on the ground using a control point (visualized as a yellow ball).
+The project demonstrates the dynamics simulation and control of a **robotic bicycle**, capable of tracing out user-specified text in 2D.
 
 - Dynamics are derived and computed using [MotionGenesis](https://www.motiongenesis.com)
 - Simulation results are visualized using [MGView](https://github.com/mgview/mgview)
@@ -24,9 +24,9 @@ The project demonstrates the dynamics simulation and control of a **robotic bicy
 
 ## How It Works
 
-1. **Text → Trajectory**: `trajectory_generator.py` converts a text string into a list of waypoints, saved as `robot_trajectory.csv`, along with a 3D mesh of the text (`text_mesh.obj`, `text_material.mtl`).
-2. **Trajectory → Simulation**: `MIPSI.m` reads `robot_trajectory.csv` and runs the MotionGenesis-derived dynamics/control simulation, producing `.i` data files in `data_files/`.
-3. **Simulation → Visualization**: `MIPSI.json` configures MGView to load both the simulation data and the text mesh, so you can watch the robotic bicycle trace out the input text.
+1. **Text -> Trajectory**: `trajectory_generator.py` converts a text string into a list of waypoints, saved as `robot_trajectory.csv`, along with a 3D mesh of the text (`text_mesh.obj`, `text_material.mtl`).
+2. **Trajectory -> Simulation**: `MIPSI.m` reads `robot_trajectory.csv` and runs the MotionGenesis-derived dynamics/control simulation, producing `.i` data files in `data_files/`.
+3. **Simulation -> Visualization**: `MIPSI.json` configures MGView to load both the simulation data and the text mesh, so you can watch the robotic bicycle trace out the input text.
 
 ---
 
@@ -38,13 +38,13 @@ The project demonstrates the dynamics simulation and control of a **robotic bicy
    ```
    Replace it with any string you'd like.
 
-2. Run the script — this generates the files in `trajectory_files/`.
+2. Run the script. This generates the files in `trajectory_files/`.
 
-3. Run `MIPSI.m` in MATLAB — this generates the `.i` files in `data_files/`.
+3. Run `MIPSI.m` in MATLAB. This generates the `.i` files in `data_files/`.
 
 4. Open **MGView** and load `MIPSI.json` (or refresh the page if it's already open).
 
-5. Press play and enjoy! 🚲
+5. Press play and enjoy!
 
 ---
 
