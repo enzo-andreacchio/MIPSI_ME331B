@@ -9,3 +9,5 @@ MIPSI.in
 MIPSI.[0-9]*
 data_files/*
 !data_files/.gitkeep
+trajectory_files/*
+!trajectory_files/.gitkeep

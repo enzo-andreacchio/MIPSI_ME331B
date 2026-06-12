@@ -278,11 +278,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
     output_dir = "csv_files"
     os.makedirs(output_dir, exist_ok=True)
 
-    # ---------------------------------------------------------
-    # Step 1: Extract Single-Line Stroke Geometry from Text
-    # ---------------------------------------------------------
-    # Filled font outlines produce hollow letters. This stroke font defines each
-    # character as one or more centerline paths that a plotting robot can follow.
     strokes = build_single_line_text_strokes(text_input)
     raw_points = strokes_to_waypoints(strokes)
 
@@ -290,10 +285,7 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
         raise ValueError(
             "No single-line path could be generated from the provided text."
         )
-
-    # ---------------------------------------------------------
-    # Step 2: Enforce Workspace Constraints & Handle Scaling
-    # ---------------------------------------------------------
+        
     all_x = [p[0] for p in raw_points]
     all_y = [p[1] for p in raw_points]
 
@@ -304,19 +296,15 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
     target_y_range = y_max - y_min
     scale_factor = target_y_range / (source_y_range if source_y_range != 0 else 1.0)
 
-    # Transform coordinates: map y safely, scale x identically to maintain aspect ratio
     scaled_points = []
     for x, y, pd in raw_points:
         sx = (x - min_x) * scale_factor  # Starts x smoothly at 0
         sy = y_min + (y - min_y) * scale_factor
         scaled_points.append((sx, sy, pd))
 
-    # ---------------------------------------------------------
-    # Step 3: Compute Time Vectors (t) based on Linear Velocity
-    # ---------------------------------------------------------
     trajectory = []
     t = 0.0
-    # Establish baseline index
+
     trajectory.append(
         (t, scaled_points[0][0], scaled_points[0][1], scaled_points[0][2])
     )
@@ -331,9 +319,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
             t += dt
         trajectory.append((t, x1, y1, pd1))
 
-    # ---------------------------------------------------------
-    # Step 4: Export to CSV
-    # ---------------------------------------------------------
     csv_path = os.path.join(output_dir, "robot_trajectory.csv")
     with open(csv_path, mode="w", newline="") as f:
         writer = csv.writer(f)
@@ -345,11 +330,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
 
     print(f"[✔] Trajectory CSV written to: {csv_path}")
 
-    # ---------------------------------------------------------
-    # Step 5: Export OBJ & MTL Files (Flat Ribbon along exact paths)
-    # ---------------------------------------------------------
-    # Group points into active drawing strokes to build 3D mesh strips.
-    # Pen-up transit stays in the CSV but is not rendered as ink in the OBJ.
     mesh_strokes = []
     current_stroke = []
     for pt in scaled_points:
@@ -371,7 +351,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
         if n_pts < 2:
             continue
 
-        # Calculate normals along the 2D path to extrude its physical width
         normals = []
         for i in range(n_pts):
             if i == 0:
@@ -396,7 +375,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
             x, y = stroke[i]
             nx, ny = normals[i]
 
-            # Left and Right edges defining structural width at z=0 for sharp projection mapping
             obj_vertices.append(
                 (x + nx * (stroke_width / 2.0), y + ny * (stroke_width / 2.0), 0.0)
             )
@@ -405,7 +383,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
             )
             v_idx += 2
 
-        # Connect the generated edges into solid quad surfaces
         for i in range(n_pts - 1):
             l_i = stroke_v_start + 2 * i
             r_i = stroke_v_start + 2 * i + 1
@@ -418,7 +395,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
     obj_path = os.path.join(output_dir, "text_mesh.obj")
     mtl_path = os.path.join(output_dir, "text_material.mtl")
 
-    # Opening with "w" intentionally overwrites old OBJ/MTL exports.
     with open(mtl_path, "w") as f:
         f.write("# Material definitions for text background overlay\n")
         f.write("newmtl NeonProjectionColor\n")
@@ -436,9 +412,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
 
     print(f"[✔] 3D Mesh OBJ written to: {obj_path}")
 
-    # ---------------------------------------------------------
-    # Step 6: Animated Real-Time Simulation Plotting
-    # ---------------------------------------------------------
     fig, ax = plt.subplots(figsize=(12, 5))
     max_x_bound = max([p[0] for p in scaled_points])
     ax.set_xlim(-2, max_x_bound + 2)
@@ -468,7 +441,6 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
     ax.set_xlabel("X Workspace (Unconstrained)")
     ax.set_ylabel("Y Workspace (Constrained)")
 
-    # Downsample frame indices slightly to secure snappy playback rates for long text blocks
     step = max(1, len(trajectory) // 250)
     frame_indices = list(range(0, len(trajectory), step))
     if frame_indices[-1] != len(trajectory) - 1:
@@ -493,7 +465,7 @@ def generate_robot_art(text_input, y_min, y_max, velocity=10.0, stroke_width=0.5
 
 if __name__ == "__main__":
     # --- Configurable Variables ---
-    INPUT_STRING = "ME331B"
+    INPUT_STRING = "ME331B IS AWESOME"
     Y_MIN_LIMIT = 0.4
     Y_MAX_LIMIT = 1.0
     FEED_RATE = 1  # Units per second velocity
