@@ -1,4 +1,4 @@
-# MIPSI — Robotic Bicycle
+# MIPSI - Robotic Bicycle
 
 This repository contains the **MIPSI** project, developed for **ME331B: Advanced Dynamics and Computation** at Stanford University, taught by **Prof. Paul Mitiguy**.
 
